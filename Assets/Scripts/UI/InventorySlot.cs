@@ -15,7 +15,7 @@ namespace GlassUI
 
         public static InventorySlot Create(Transform parent, int index)
         {
-            var frame = GlassUI.Rect(parent, $"Slot {index:00}", new Color(0f, 0f, 0f, 0.58f), GlassTheme.RadiusItem, 1f, false);
+            var frame = GlassUI.Rect(parent, $"Slot {index:00}", new Color(1f, 1f, 1f, 0.28f), GlassTheme.RadiusItem, 0.9f, true);
             GlassUI.Fix(frame, 72f, 72f);
             frame.raycastTarget = true;
 

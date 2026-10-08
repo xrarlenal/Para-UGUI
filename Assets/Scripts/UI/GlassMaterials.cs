@@ -4,8 +4,8 @@ using UnityEngine;
 namespace GlassUI
 {
     /// <summary>
-    /// 圆角贴图访问入口。贴图由菜单「Glass Demo / 0. 生成圆角贴图」程序化生成：
-    /// alpha = 形状，RGB = 纯白。
+    /// 圆角贴图的访问入口。贴图由菜单「Glass Demo / 0. 生成圆角贴图」程序化生成。
+    /// 一张贴图三个通道：A = 形状，R = 边缘渐变（玻璃厚度高光），G = 描边带。
     /// </summary>
     public static class GlassSprites
     {
@@ -30,15 +30,7 @@ namespace GlassUI
             return sprite;
         }
 
-        /// <summary>贴图里烘焙的圆角半径（从名字 roundNN 解析）。</summary>
-        public static float BakedRadius(string spriteName)
-        {
-            if (string.IsNullOrEmpty(spriteName)) return 0f;
-            if (spriteName.StartsWith("round") && float.TryParse(spriteName.Substring(5), out var value)) return value;
-            return 0f;
-        }
-
-        /// <summary>按想要的圆角半径挑最接近的贴图（真实半径由 ppuMultiplier 换算，见 GlassUI.ApplyRadius）。</summary>
+        /// <summary>按想要的圆角半径挑最接近的贴图（九宫格圆角是固定像素的，半径要跟贴图对上）。</summary>
         public static string ForRadius(float radius)
         {
             if (radius <= 11f) return Round08;
@@ -49,13 +41,16 @@ namespace GlassUI
         }
     }
 
-    /// <summary>UI 材质：运行时创建、按参数分档缓存。</summary>
+    /// <summary>
+    /// UI 材质。这些材质在运行时创建（编辑器里建出来的材质存不进场景），所以同一份配置只建一次并缓存。
+    /// </summary>
     public static class GlassMaterials
     {
         static Material _rounded;
         static readonly Dictionary<int, Material> FrostedCache = new Dictionary<int, Material>();
+        static readonly Dictionary<int, Material> StrokedCache = new Dictionary<int, Material>();
 
-        /// <summary>实心圆角块：颜色走顶点色，全工程共用一份材质。</summary>
+        /// <summary>实心圆角块：颜色走顶点色，所以全工程共用一份材质。</summary>
         public static Material Rounded()
         {
             if (_rounded == null)
@@ -67,7 +62,7 @@ namespace GlassUI
             return _rounded;
         }
 
-        /// <summary>毛玻璃：按 blurLod 分档共用。背景统一叠 20% 黑。</summary>
+        /// <summary>毛玻璃：按 blurLod 分档共用材质（同一档位一份）。</summary>
         public static Material Frosted(float blurLod = 7f)
         {
             int key = Mathf.RoundToInt(blurLod * 10f);
@@ -82,15 +77,35 @@ namespace GlassUI
                 hideFlags = HideFlags.HideAndDontSave,
             };
             material.SetFloat("_BlurLod", blurLod);
-            material.SetFloat("_Darken", 0.20f);
+            material.SetFloat("_Darken", 0.10f);   // 背景统一叠 10% 黑
             FrostedCache[key] = material;
             return material;
         }
 
-        /// <summary>圆角块（描边通道已取消，需要描边用单独的圆角框控件）。</summary>
+        /// <summary>带描边的实心圆角块（输入框、选中态描边）。</summary>
         public static Material Stroked(Color strokeColor, float strength)
         {
-            return Rounded();
+            int key = ColorKey(strokeColor) * 100 + Mathf.RoundToInt(strength * 100f);
+            if (StrokedCache.TryGetValue(key, out var cached) && cached != null) return cached;
+
+            var shader = Shader.Find("UI/RoundedRect");
+            if (shader == null) return null;
+
+            var material = new Material(shader)
+            {
+                name = "RoundedRect (stroked)",
+                hideFlags = HideFlags.HideAndDontSave,
+            };
+            material.SetColor("_StrokeColor", strokeColor);
+            material.SetFloat("_StrokeStrength", Mathf.Clamp01(strength));
+            StrokedCache[key] = material;
+            return material;
+        }
+
+        static int ColorKey(Color c)
+        {
+            return (Mathf.RoundToInt(c.r * 255f) << 24) | (Mathf.RoundToInt(c.g * 255f) << 16) |
+                   (Mathf.RoundToInt(c.b * 255f) << 8) | Mathf.RoundToInt(c.a * 255f);
         }
     }
 }

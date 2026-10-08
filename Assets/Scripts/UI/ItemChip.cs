@@ -22,7 +22,7 @@ namespace GlassUI
         public static ItemChip Create(Transform parent, ItemDef item, InventoryView view)
         {
             var holder = GlassUI.Node(parent, "Item: " + item.name);
-            GlassUI.Stretch(holder, 1f, 1f, 1f, 1f);   // 填满格子，别留出漏光的缝
+            GlassUI.Stretch(holder, 5f, 5f, 5f, 5f);
 
             var bg = GlassUI.Rect(holder, "BG", item.color, GlassTheme.RadiusItem);
             GlassUI.Stretch(bg.rectTransform);

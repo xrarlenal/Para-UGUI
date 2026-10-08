@@ -95,7 +95,7 @@ namespace GlassUI
 
             for (int i = 0; i < 4; i++)
             {
-                var tick = GlassUI.Rect(_crosshair, $"Tick {i}", new Color(1f, 1f, 1f, 0.92f), 6f);
+                var tick = GlassUI.Rect(_crosshair, $"Tick {i}", new Color(1f, 1f, 1f, 0.92f), 99f);
                 GlassUI.Place(tick.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(2.6f, 11f), Vector2.zero);
                 _ticks.Add(tick.rectTransform);
             }
@@ -104,7 +104,7 @@ namespace GlassUI
             GlassUI.Place(_hitMarker, new Vector2(0.5f, 0.5f), new Vector2(42f, 42f), Vector2.zero);
             for (int i = 0; i < 4; i++)
             {
-                var mark = GlassUI.Rect(_hitMarker, $"Mark {i}", Color.white, 6f);
+                var mark = GlassUI.Rect(_hitMarker, $"Mark {i}", Color.white, 99f);
                 GlassUI.Place(mark.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(2.4f, 9f), Vector2.zero);
                 var rt = mark.rectTransform;
                 rt.localRotation = Quaternion.Euler(0f, 0f, 45f + i * 90f);

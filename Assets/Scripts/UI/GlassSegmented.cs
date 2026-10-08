@@ -26,10 +26,10 @@ namespace GlassUI
             var label = GlassUI.Label(row, name, 15, TextAnchor.MiddleLeft, GlassTheme.InkSoft);
             GlassUI.Place(label.rectTransform, new Vector2(0f, 0.5f), new Vector2(180f, 26f), Vector2.zero, new Vector2(0f, 0.5f));
 
-            var holder = GlassUI.Rect(row, "Holder", new Color(0f, 0f, 0f, 0.58f), 6f, 1f, false);
+            var holder = GlassUI.Rect(row, "Holder", new Color(1f, 1f, 1f, 0.32f), 99f, 0.9f, true);
             GlassUI.Place(holder.rectTransform, new Vector2(1f, 0.5f), new Vector2(260f, 30f), Vector2.zero, new Vector2(1f, 0.5f));
 
-            var highlight = GlassUI.Rect(holder.transform, "Highlight", GlassTheme.Blue, 6f);
+            var highlight = GlassUI.Rect(holder.transform, "Highlight", GlassTheme.Blue, 99f);
             highlight.rectTransform.anchorMin = new Vector2(0f, 0.5f);
             highlight.rectTransform.anchorMax = new Vector2(0f, 0.5f);
             highlight.rectTransform.pivot = new Vector2(0f, 0.5f);
@@ -46,7 +46,7 @@ namespace GlassUI
                 var item = GlassUI.Node(holder.transform, "Item " + i);
                 GlassUI.Place(item, new Vector2(0f, 0.5f), new Vector2(width, 24f), new Vector2(3f + width * i, 0f), new Vector2(0f, 0.5f));
 
-                var hit = GlassUI.Rect(item, "Hit", new Color(1f, 1f, 1f, 0f), 6f);
+                var hit = GlassUI.Rect(item, "Hit", new Color(1f, 1f, 1f, 0f), 99f);
                 GlassUI.Stretch(hit.rectTransform);
                 hit.raycastTarget = true;
                 hit.gameObject.AddComponent<Button>().onClick.AddListener(() => segmented.Select(index));

@@ -40,13 +40,13 @@ namespace GlassUI
             var track = GlassUI.Node(row, "Track");
             GlassUI.Stretch(track, 160f, 12f, 96f, 12f);
 
-            var bg = GlassUI.Rect(track, "BG", new Color(0f, 0f, 0f, 0.62f), 5f);
+            var bg = GlassUI.Rect(track, "BG", new Color(1f, 1f, 1f, 0.40f), 99f);
             GlassUI.Stretch(bg.rectTransform);
 
-            var fill = GlassUI.Rect(track, "Fill", GlassTheme.Blue, 5f);
+            var fill = GlassUI.Rect(track, "Fill", GlassTheme.Blue, 99f);
             GlassUI.Stretch(fill.rectTransform);
 
-            var knob = GlassUI.Rect(track, "Knob", Color.white, 5f);
+            var knob = GlassUI.Rect(track, "Knob", Color.white, 99f);
             // 用锚点表示位置：拉伸矩形上改 anchoredPosition 会被拉伸/变形，锚点则天然跟着比例走
             knob.rectTransform.anchorMin = new Vector2(0f, 0.5f);
             knob.rectTransform.anchorMax = new Vector2(0f, 0.5f);

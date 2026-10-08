@@ -209,7 +209,6 @@ namespace GlassUI
             image.sprite = GlassSprites.Get(GlassSprites.ForRadius(radius));
             image.type = Image.Type.Sliced;
             image.material = GlassMaterials.Frosted(blurLod);
-            ApplyRadius(image, radius);
             image.color = Color.white;      // 白色 = 不给玻璃上色
             image.raycastTarget = true;
             return image;
@@ -219,18 +218,6 @@ namespace GlassUI
         /// 实心圆角块（蓝白色条、胶囊、进度条、按钮底）。
         /// opacity &lt; 1 用来做"二级按钮/勾选框"那种更轻的背景框；shadow 给它们一点点黑色阴影。
         /// </summary>
-        /// <summary>把九宫格贴图的边框缩放到目标半径：任意半径共用同一批贴图，也绝不会被挤成椭圆。</summary>
-        /// <summary>临时开关：用来 A/B 验证那圈浅色边框到底是不是 Shadow 造成的。</summary>
-        public static bool SHADOWS_ENABLED = true;
-
-        static void ApplyRadius(Image image, float radius)
-        {
-            var sprite = image.sprite;
-            if (sprite == null) return;
-            float baked = GlassSprites.BakedRadius(sprite.name);
-            image.pixelsPerUnitMultiplier = baked > 0.01f && radius > 0.01f ? baked / radius : 1f;
-        }
-
         public static Image Rect(Transform parent, string name, Color color, float radius = GlassTheme.RadiusPill,
             float opacity = 1f, bool shadow = false)
         {
@@ -239,15 +226,15 @@ namespace GlassUI
             image.sprite = GlassSprites.Get(GlassSprites.ForRadius(radius));
             image.type = Image.Type.Sliced;
             image.material = GlassMaterials.Rounded();
-            ApplyRadius(image, radius);
             image.color = opacity >= 1f ? color : new Color(color.r, color.g, color.b, color.a * opacity);
             image.raycastTarget = false;
 
-            if (shadow && SHADOWS_ENABLED)
+            if (shadow)
             {
+                // UGUI 自带的 Shadow：便宜、够用，就是"一点点黑色阴影"
                 var shadowEffect = image.gameObject.AddComponent<Shadow>();
-                shadowEffect.effectColor = new Color(0f, 0f, 0f, 0.22f);
-                shadowEffect.effectDistance = new Vector2(0f, -1f);
+                shadowEffect.effectColor = new Color(0f, 0f, 0f, 0.35f);
+                shadowEffect.effectDistance = new Vector2(0f, -2f);
                 shadowEffect.useGraphicAlpha = true;
             }
             return image;
