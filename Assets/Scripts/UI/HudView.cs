@@ -197,7 +197,7 @@ namespace GlassUI
             for (int i = 0; i < 3; i++)
             {
                 int index = i;
-                var chip = GlassUI.Rect(bar.transform, $"Weapon Chip {i + 1}", new Color(1f, 1f, 1f, 0.5f), GlassTheme.RadiusItem);
+                var chip = GlassUI.Rect(bar.transform, $"Weapon Chip {i + 1}", new Color(1f, 1f, 1f, 0.5f), GlassTheme.RadiusItem, 0.9f, true);
                 GlassUI.Flex(chip, width: 1f);
                 GlassUI.Fix(chip, -1f, 50f);
                 chip.raycastTarget = true;

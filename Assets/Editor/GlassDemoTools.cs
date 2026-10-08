@@ -57,10 +57,9 @@ namespace GlassUI.EditorTools
                 }
                 else
                 {
-                    // 已存在就把参数同步成代码里的默认值——不然改了默认值，老资产不会跟着变
+                    // 已存在就把注入点同步成代码里的默认值
                     feature.settings = new FrostedGlassFeature.Settings();
-                    Debug.Log($"[GlassUI] {path} 已有 Feature，参数已同步为代码默认值" +
-                              $"（降采样 1/{1 << feature.settings.downsample}，高斯 σ {feature.settings.sigma}、迭代 {feature.settings.iterations}）");
+                    Debug.Log($"[GlassUI] {path} 已有 Feature，注入点同步为 {feature.settings.injectionPoint}");
                 }
 
                 EditorUtility.SetDirty(feature);

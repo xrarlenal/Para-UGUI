@@ -219,9 +219,10 @@ namespace GlassUI.EditorTools
             PlacePlayer(new Vector3(-6f, 0.1f, 22f), 6f);
             Render(cam, canvas, width, height, $"{dir}/04_weapon_shotgun.png");
 
-            // 贴近箱堆：看毛玻璃把细节糊掉、和周围清晰画面对比
+            // 站在箱堆前低头看：让底部面板压在箱堆/立柱这些有细节的东西上，
+            // 这样才能一眼看出「面板内是糊的、面板外是清晰的」
             if (weapons != null) weapons.Equip(0, true);
-            PlacePlayer(new Vector3(-13f, 0.1f, 4f), 12f);
+            PlacePlayer(new Vector3(-9f, 0.1f, 6f), -37f, -14f);
             Render(cam, canvas, width, height, $"{dir}/05_glass_over_detail.png");
             Render(cam, canvas, width, height, $"{dir}/01_hud.png");
 
@@ -275,7 +276,7 @@ namespace GlassUI.EditorTools
             return go != null ? go.transform : null;
         }
 
-        static void PlacePlayer(Vector3 position, float yaw)
+        static void PlacePlayer(Vector3 position, float yaw, float pitch = 0f)
         {
             var player = FindPlayer();
             if (player != null)
@@ -287,7 +288,7 @@ namespace GlassUI.EditorTools
             else Debug.LogError("[DIAG] 找不到 Player 对象");
 
             var cam = Object.FindFirstObjectByType<Camera>();
-            if (cam != null) cam.transform.localRotation = Quaternion.identity;   // 平视
+            if (cam != null) cam.transform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
         }
 
         /// <summary>

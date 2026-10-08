@@ -47,7 +47,7 @@ namespace GlassUI
     public static class GlassMaterials
     {
         static Material _rounded;
-        static Material _frosted;
+        static readonly Dictionary<int, Material> FrostedCache = new Dictionary<int, Material>();
         static readonly Dictionary<int, Material> StrokedCache = new Dictionary<int, Material>();
 
         /// <summary>实心圆角块：颜色走顶点色，所以全工程共用一份材质。</summary>
@@ -62,16 +62,24 @@ namespace GlassUI
             return _rounded;
         }
 
-        /// <summary>毛玻璃：全工程共用一份材质（纯高斯模糊结果，没有叠加项，所以无需按参数分档）。</summary>
-        public static Material Frosted()
+        /// <summary>毛玻璃：按 blurLod 分档共用材质（同一档位一份）。</summary>
+        public static Material Frosted(float blurLod = 7f)
         {
-            if (_frosted == null)
+            int key = Mathf.RoundToInt(blurLod * 10f);
+            if (FrostedCache.TryGetValue(key, out var cached) && cached != null) return cached;
+
+            var shader = Shader.Find("UI/FrostedGlass");
+            if (shader == null) return null;
+
+            var material = new Material(shader)
             {
-                var shader = Shader.Find("UI/FrostedGlass");
-                if (shader == null) return null;
-                _frosted = new Material(shader) { name = "FrostedGlass (shared)", hideFlags = HideFlags.HideAndDontSave };
-            }
-            return _frosted;
+                name = $"FrostedGlass (lod {blurLod:0.0})",
+                hideFlags = HideFlags.HideAndDontSave,
+            };
+            material.SetFloat("_BlurLod", blurLod);
+            material.SetFloat("_Darken", 0.10f);   // 背景统一叠 10% 黑
+            FrostedCache[key] = material;
+            return material;
         }
 
         /// <summary>带描边的实心圆角块（输入框、选中态描边）。</summary>

@@ -202,28 +202,41 @@ namespace GlassUI
         /// 纯模糊结果，不加任何白色/彩色叠加。
         /// 形状与圆角来自九宫格贴图（alpha），所以直接把 Image 用起来——布局、遮罩、Filled 都能照常使。
         /// </summary>
-        public static Image Panel(Transform parent, string name = "Glass Panel", float radius = GlassTheme.RadiusPanel)
+        public static Image Panel(Transform parent, string name = "Glass Panel", float radius = GlassTheme.RadiusPanel, float blurLod = 7f)
         {
             var rt = Node(parent, name);
             var image = rt.gameObject.AddComponent<Image>();
             image.sprite = GlassSprites.Get(GlassSprites.ForRadius(radius));
             image.type = Image.Type.Sliced;
-            image.material = GlassMaterials.Frosted();
+            image.material = GlassMaterials.Frosted(blurLod);
             image.color = Color.white;      // 白色 = 不给玻璃上色
             image.raycastTarget = true;
             return image;
         }
 
-        /// <summary>实心圆角块（蓝白色条、胶囊、进度条、头像底）。</summary>
-        public static Image Rect(Transform parent, string name, Color color, float radius = GlassTheme.RadiusPill)
+        /// <summary>
+        /// 实心圆角块（蓝白色条、胶囊、进度条、按钮底）。
+        /// opacity &lt; 1 用来做"二级按钮/勾选框"那种更轻的背景框；shadow 给它们一点点黑色阴影。
+        /// </summary>
+        public static Image Rect(Transform parent, string name, Color color, float radius = GlassTheme.RadiusPill,
+            float opacity = 1f, bool shadow = false)
         {
             var rt = Node(parent, name);
             var image = rt.gameObject.AddComponent<Image>();
             image.sprite = GlassSprites.Get(GlassSprites.ForRadius(radius));
             image.type = Image.Type.Sliced;
             image.material = GlassMaterials.Rounded();
-            image.color = color;
+            image.color = opacity >= 1f ? color : new Color(color.r, color.g, color.b, color.a * opacity);
             image.raycastTarget = false;
+
+            if (shadow)
+            {
+                // UGUI 自带的 Shadow：便宜、够用，就是"一点点黑色阴影"
+                var shadowEffect = image.gameObject.AddComponent<Shadow>();
+                shadowEffect.effectColor = new Color(0f, 0f, 0f, 0.35f);
+                shadowEffect.effectDistance = new Vector2(0f, -2f);
+                shadowEffect.useGraphicAlpha = true;
+            }
             return image;
         }
 
@@ -267,7 +280,8 @@ namespace GlassUI
         public static Button Pill(Transform parent, string text, Action onClick, float height = 44f,
             float radius = GlassTheme.RadiusPill, bool primary = true, int fontSize = 17)
         {
-            var bg = Rect(parent, "Pill: " + text, primary ? GlassTheme.Blue : GlassTheme.White, radius);
+            var bg = Rect(parent, "Pill: " + text, primary ? GlassTheme.Blue : GlassTheme.White, radius,
+                primary ? 1f : 0.9f, shadow: !primary);
             bg.raycastTarget = true;
             Fix(bg, -1f, height);
 

@@ -19,17 +19,8 @@ namespace GlassUI
         [System.Serializable]
         public class Settings
         {
-            [Tooltip("插在管线的哪一步之后。Transparents 之后能连半透明物体一起糊（UI 通常更想要这个）")]
-            public RenderPassEvent injectionPoint = RenderPassEvent.AfterRenderingTransparents;   // 真实 Overlay 画布下 UI 在这之后才画，所以糊的是「没有 UI 的画面」
-
-            [Tooltip("降采样倍数。0 = 与屏幕同分辨率（默认，质量最高）。只在性能吃紧时才升它，升了就不是全分辨率纹理了")]
-            [Range(0, 4)] public int downsample = 0;
-
-            [Tooltip("高斯迭代次数：每次都是横向+纵向一遍，等效 σ 按 √n 变宽")]
-            [Range(1, 6)] public int iterations = 2;
-
-            [Tooltip("高斯 σ（以目标像素为单位），就是「核有多宽」")]
-            [Range(0.2f, 24f)] public float sigma = 8f;
+            [Tooltip("插在管线的哪一步之后。放在 Transparents 之后才能把半透明物体也糊进去（真实 Overlay 画布下 UI 还没画）")]
+            public RenderPassEvent injectionPoint = RenderPassEvent.AfterRenderingTransparents;
         }
 
         public Settings settings = new Settings();
@@ -76,15 +67,11 @@ namespace GlassUI
             public const string GlobalTexture = "_FrostedGlassTex";
 
             static readonly int TexId = Shader.PropertyToID(GlobalTexture);
-            static readonly int TexelSizeId = Shader.PropertyToID("_FrostedSourceTexelSize");
-            static readonly int DirectionId = Shader.PropertyToID("_BlurDirection");
-            static readonly int RadiusId = Shader.PropertyToID("_BlurRadius");
 
             readonly Material _material;
             Settings _settings;
 
             RTHandle _blurA;
-            RTHandle _blurB;
 
             public FrostedGlassPass(Material material)
             {
@@ -100,57 +87,40 @@ namespace GlassUI
 
             public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
             {
-                if (_material == null) return;
+                if (_blurA == null && !Allocate(renderingData)) return;
 
                 var cameraData = renderingData.cameraData;
                 var source = cameraData.renderer != null ? cameraData.renderer.cameraColorTargetHandle : null;
                 if (source == null) return;
 
-                var descriptor = cameraData.cameraTargetDescriptor;
-                int downsample = Mathf.Clamp(_settings.downsample, 0, 4);
-                int width = Mathf.Max(1, descriptor.width >> downsample);
-                int height = Mathf.Max(1, descriptor.height >> downsample);
-
-                var blurDesc = new RenderTextureDescriptor(width, height, RenderTextureFormat.Default, 0)
-                {
-                    msaaSamples = 1,
-                    useMipMap = false,
-                    autoGenerateMips = false,
-                    enableRandomWrite = false,
-                };
-
-                RenderingUtils.ReAllocateIfNeeded(ref _blurA, blurDesc, FilterMode.Bilinear, TextureWrapMode.Clamp, name: "_FrostedBlurA");
-                RenderingUtils.ReAllocateIfNeeded(ref _blurB, blurDesc, FilterMode.Bilinear, TextureWrapMode.Clamp, name: "_FrostedBlurB");
-
-                var cmd = CommandBufferPool.Get("Frosted Glass Blur");
-                cmd.SetGlobalVector(TexelSizeId, new Vector4(1f / width, 1f / height, width, height));
-                cmd.SetGlobalFloat(RadiusId, _settings.sigma);
-
-                // 第一遍顺便完成降采样：直接 blit 到 1/2^n 分辨率，双线性就是最省的下采样
-                cmd.SetGlobalVector(DirectionId, new Vector2(1f, 0f));
-                Blitter.BlitCameraTexture(cmd, source, _blurA, _material, 0);
-
-                for (int i = 0; i < _settings.iterations; i++)
-                {
-                    cmd.SetGlobalVector(DirectionId, new Vector2(1f, 0f));
-                    Blitter.BlitCameraTexture(cmd, _blurA, _blurB, _material, 0);
-                    cmd.SetGlobalVector(DirectionId, new Vector2(0f, 1f));
-                    Blitter.BlitCameraTexture(cmd, _blurB, _blurA, _material, 0);
-                }
-
-                // 公布给 UI：全局纹理这一帧内一直有效
+                var cmd = CommandBufferPool.Get("Frosted Glass Mips");
+                // 1) 拷「没有 UI 的画面」进 mip0
+                Blitter.BlitCameraTexture(cmd, source, _blurA);
+                // 2) 生成整条 mip 链：每一级就是上一级缩小一半 = 逐级更糊
+                cmd.GenerateMips(_blurA.nameID);
+                // 3) 公布给 UI，UI 用 textureLod 自己决定取哪一级
                 cmd.SetGlobalTexture(TexId, _blurA.nameID);
 
                 context.ExecuteCommandBuffer(cmd);
                 CommandBufferPool.Release(cmd);
             }
 
+            bool Allocate(in RenderingData renderingData)
+            {
+                var descriptor = renderingData.cameraData.cameraTargetDescriptor;
+                descriptor.msaaSamples = 1;
+                descriptor.depthBufferBits = 0;
+                descriptor.useMipMap = true;          // 关键：要 mip 链
+                descriptor.autoGenerateMips = false;  // 自己生成，避免多余开销
+                RenderingUtils.ReAllocateIfNeeded(ref _blurA, descriptor, FilterMode.Trilinear,
+                    TextureWrapMode.Clamp, name: "_FrostedGlassMip");
+                return _blurA != null;
+            }
+
             public void Dispose()
             {
                 _blurA?.Release();
-                _blurB?.Release();
                 _blurA = null;
-                _blurB = null;
             }
         }
     }

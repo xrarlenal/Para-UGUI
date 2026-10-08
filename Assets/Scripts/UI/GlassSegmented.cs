@@ -26,7 +26,7 @@ namespace GlassUI
             var label = GlassUI.Label(row, name, 15, TextAnchor.MiddleLeft, GlassTheme.InkSoft);
             GlassUI.Place(label.rectTransform, new Vector2(0f, 0.5f), new Vector2(180f, 26f), Vector2.zero, new Vector2(0f, 0.5f));
 
-            var holder = GlassUI.Rect(row, "Holder", new Color(1f, 1f, 1f, 0.32f), 99f);
+            var holder = GlassUI.Rect(row, "Holder", new Color(1f, 1f, 1f, 0.32f), 99f, 0.9f, true);
             GlassUI.Place(holder.rectTransform, new Vector2(1f, 0.5f), new Vector2(260f, 30f), Vector2.zero, new Vector2(1f, 0.5f));
 
             var highlight = GlassUI.Rect(holder.transform, "Highlight", GlassTheme.Blue, 99f);
