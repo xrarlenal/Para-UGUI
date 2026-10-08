@@ -144,7 +144,7 @@ namespace GlassUI
 
         void BuildHealth(Transform root)
         {
-            var panel = GlassUI.Panel(root, "Health Panel", GlassTheme.RadiusCard, 0.26f, 1.3f);
+            var panel = GlassUI.Panel(root, "Health Panel", GlassTheme.RadiusCard);
             GlassUI.Place(panel.rectTransform, new Vector2(0f, 0f), new Vector2(340f, 96f), new Vector2(48f, 48f), new Vector2(0f, 0f));
 
             var label = GlassUI.Label(panel.transform, "生命", 14, TextAnchor.UpperLeft, GlassTheme.InkSoft);
@@ -159,7 +159,7 @@ namespace GlassUI
 
         void BuildAmmo(Transform root)
         {
-            var panel = GlassUI.Panel(root, "Ammo Panel", GlassTheme.RadiusCard, 0.26f, 1.3f);
+            var panel = GlassUI.Panel(root, "Ammo Panel", GlassTheme.RadiusCard);
             GlassUI.Place(panel.rectTransform, new Vector2(1f, 0f), new Vector2(316f, 96f), new Vector2(-48f, 48f), new Vector2(1f, 0f));
 
             _weaponName = GlassUI.Label(panel.transform, "—", 15, TextAnchor.UpperRight, GlassTheme.InkSoft);
@@ -175,7 +175,7 @@ namespace GlassUI
 
         void BuildScore(Transform root)
         {
-            var panel = GlassUI.Panel(root, "Score Panel", GlassTheme.RadiusCard, 0.26f, 1.3f);
+            var panel = GlassUI.Panel(root, "Score Panel", GlassTheme.RadiusCard);
             GlassUI.Place(panel.rectTransform, new Vector2(0f, 1f), new Vector2(260f, 56f), new Vector2(48f, -40f), new Vector2(0f, 1f));
 
             var label = GlassUI.Label(panel.transform, "训练得分", 14, TextAnchor.MiddleLeft, GlassTheme.InkSoft);
@@ -189,7 +189,7 @@ namespace GlassUI
 
         void BuildWeaponBar(Transform root)
         {
-            var bar = GlassUI.Panel(root, "Weapon Bar", GlassTheme.RadiusCard, 0.24f, 1.3f);
+            var bar = GlassUI.Panel(root, "Weapon Bar", GlassTheme.RadiusCard);
             GlassUI.Place(bar.rectTransform, new Vector2(0.5f, 0f), new Vector2(560f, 74f), new Vector2(0f, 48f), new Vector2(0.5f, 0f));
             var row = GlassUI.Row(bar.rectTransform, 10f, 12, TextAnchor.MiddleCenter);
             row.childForceExpandWidth = true;
@@ -223,7 +223,7 @@ namespace GlassUI
 
         public void Toast(string message)
         {
-            var panel = GlassUI.Panel(transform, "Toast", GlassTheme.RadiusItem, 0.30f, 1.2f);
+            var panel = GlassUI.Panel(transform, "Toast", GlassTheme.RadiusItem);
             GlassUI.Place(panel.rectTransform, new Vector2(1f, 1f), new Vector2(10f, 40f), new Vector2(-48f, -40f), new Vector2(1f, 1f));
             var row = GlassUI.Row(panel.rectTransform, 0f, 0, TextAnchor.MiddleCenter);
             row.padding = new RectOffset(16, 16, 8, 8);

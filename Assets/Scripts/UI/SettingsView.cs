@@ -33,7 +33,7 @@ namespace GlassUI
 
         public static SettingsView Create(Transform root, Camera camera, Game.PlayerController player, VolumeProfile profile)
         {
-            var panel = GlassUI.Panel(root, "设置", GlassTheme.RadiusPanel, 0.09f);
+            var panel = GlassUI.Panel(root, "设置", GlassTheme.RadiusPanel);
             GlassUI.Place(panel.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(980f, 620f), Vector2.zero);
             var view = panel.gameObject.AddComponent<SettingsView>();
             view._camera = camera;
@@ -60,7 +60,7 @@ namespace GlassUI
             GlassUI.Flex(body, -1f, 1f);
 
             // 左侧页签
-            var tabs = GlassUI.Panel(body, "Tabs", GlassTheme.RadiusCard, 0.10f);
+            var tabs = GlassUI.Panel(body, "Tabs", GlassTheme.RadiusCard);
             tabs.rectTransform.anchorMin = new Vector2(0f, 0f);
             tabs.rectTransform.anchorMax = new Vector2(0.28f, 1f);
             tabs.rectTransform.offsetMin = Vector2.zero;
@@ -93,7 +93,7 @@ namespace GlassUI
             }
 
             // 右侧页面
-            var page = GlassUI.Panel(body, "Page", GlassTheme.RadiusCard, 0.10f);
+            var page = GlassUI.Panel(body, "Page", GlassTheme.RadiusCard);
             page.rectTransform.anchorMin = new Vector2(0.28f, 0f);
             page.rectTransform.anchorMax = new Vector2(1f, 1f);
             page.rectTransform.offsetMin = new Vector2(12f, 0f);

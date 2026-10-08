@@ -36,7 +36,7 @@ namespace GlassUI
             var root = (RectTransform)transform;
 
             // ---------- 左侧主面板（设置 / 背包的观感）----------
-            var panel = GlassUI.Panel(root, "Main Panel", GlassTheme.RadiusPanel, milkiness, rimBoost, blurStrength);
+            var panel = GlassUI.Panel(root, "Main Panel", GlassTheme.RadiusPanel);
             GlassUI.Place(panel.rectTransform, new Vector2(0f, 0.5f), new Vector2(470f, 566f), new Vector2(56f, 0f), new Vector2(0f, 0.5f));
             GlassUI.Col(panel.rectTransform, 14f, 28, TextAnchor.UpperLeft);
 
@@ -64,7 +64,7 @@ namespace GlassUI
             GlassUI.Flex(secondary, width: 1f);
 
             // ---------- 右上：切换武器 ----------
-            var weaponBar = GlassUI.Panel(root, "Weapon Bar", GlassTheme.RadiusCard, milkiness, rimBoost, blurStrength);
+            var weaponBar = GlassUI.Panel(root, "Weapon Bar", GlassTheme.RadiusCard);
             GlassUI.Place(weaponBar.rectTransform, new Vector2(1f, 1f), new Vector2(430f, 78f), new Vector2(-56f, -48f), new Vector2(1f, 1f));
             var weaponRow = GlassUI.Row(weaponBar.rectTransform, 10f, 12, TextAnchor.MiddleCenter);
             weaponRow.childForceExpandWidth = true;
@@ -74,7 +74,7 @@ namespace GlassUI
             AddWeaponChip(weaponBar.transform, "手枪", false);
 
             // ---------- 底部：战斗 HUD ----------
-            var hud = GlassUI.Panel(root, "Combat HUD", GlassTheme.RadiusCard, milkiness, rimBoost, blurStrength);
+            var hud = GlassUI.Panel(root, "Combat HUD", GlassTheme.RadiusCard);
             GlassUI.Place(hud.rectTransform, new Vector2(0.5f, 0f), new Vector2(880f, 104f), new Vector2(0f, 48f), new Vector2(0.5f, 0f));
             GlassUI.Row(hud.rectTransform, 22f, 20, TextAnchor.MiddleCenter);
 
@@ -91,7 +91,7 @@ namespace GlassUI
             GlassUI.Fix(ammo, 150f, 30f);
 
             // ---------- 右下：提示卡 ----------
-            var tip = GlassUI.Panel(root, "Tip Card", GlassTheme.RadiusCard, milkiness, rimBoost, blurStrength);
+            var tip = GlassUI.Panel(root, "Tip Card", GlassTheme.RadiusCard);
             GlassUI.Place(tip.rectTransform, new Vector2(1f, 0f), new Vector2(360f, 92f), new Vector2(-56f, 48f), new Vector2(1f, 0f));
             var tipLabel = GlassUI.Label(tip.transform, "鼠标移到按钮上试试非线性反馈", 15, TextAnchor.MiddleCenter,
                 GlassTheme.InkSoft, true);

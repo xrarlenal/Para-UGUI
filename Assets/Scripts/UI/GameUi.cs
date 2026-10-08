@@ -148,7 +148,7 @@ namespace GlassUI
 
         void BuildIntro(RectTransform root)
         {
-            var card = GlassUI.Panel(root, "Intro", GlassTheme.RadiusPanel, 0.10f);
+            var card = GlassUI.Panel(root, "Intro", GlassTheme.RadiusPanel);
             _introRect = card.rectTransform;
             GlassUI.Place(_introRect, new Vector2(0.5f, 0.5f), new Vector2(760f, 320f), Vector2.zero);
             _introGroup = GlassUI.Group(_introRect, 0f, true, true);

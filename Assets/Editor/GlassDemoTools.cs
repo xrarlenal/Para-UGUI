@@ -60,7 +60,7 @@ namespace GlassUI.EditorTools
                     // 已存在就把参数同步成代码里的默认值——不然改了默认值，老资产不会跟着变
                     feature.settings = new FrostedGlassFeature.Settings();
                     Debug.Log($"[GlassUI] {path} 已有 Feature，参数已同步为代码默认值" +
-                              $"（降采样 1/{1 << feature.settings.downsample}，半径 {feature.settings.radius}）");
+                              $"（降采样 1/{1 << feature.settings.downsample}，高斯 σ {feature.settings.sigma}、迭代 {feature.settings.iterations}）");
                 }
 
                 EditorUtility.SetDirty(feature);

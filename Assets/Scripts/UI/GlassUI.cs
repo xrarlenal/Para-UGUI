@@ -198,17 +198,17 @@ namespace GlassUI
         // ---------------- 图元 ----------------
 
         /// <summary>
-        /// 毛玻璃面板：背景 = 身后画面被 URP 模糊后的样子，按屏幕 UV 1:1 裁切。
+        /// 毛玻璃面板：背景 = 身后画面被 URP 做完高卷积核高斯模糊后的样子，按屏幕 UV 1:1 裁切。
+        /// 纯模糊结果，不加任何白色/彩色叠加。
         /// 形状与圆角来自九宫格贴图（alpha），所以直接把 Image 用起来——布局、遮罩、Filled 都能照常使。
         /// </summary>
-        public static Image Panel(Transform parent, string name = "Glass Panel", float radius = GlassTheme.RadiusPanel,
-            float milkiness = 0.07f, float rimBoost = 1f, float blurStrength = 1f)
+        public static Image Panel(Transform parent, string name = "Glass Panel", float radius = GlassTheme.RadiusPanel)
         {
             var rt = Node(parent, name);
             var image = rt.gameObject.AddComponent<Image>();
             image.sprite = GlassSprites.Get(GlassSprites.ForRadius(radius));
             image.type = Image.Type.Sliced;
-            image.material = GlassMaterials.Frosted(milkiness, rimBoost, blurStrength);
+            image.material = GlassMaterials.Frosted();
             image.color = Color.white;      // 白色 = 不给玻璃上色
             image.raycastTarget = true;
             return image;

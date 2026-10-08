@@ -47,7 +47,7 @@ namespace GlassUI
     public static class GlassMaterials
     {
         static Material _rounded;
-        static readonly Dictionary<int, Material> FrostedCache = new Dictionary<int, Material>();
+        static Material _frosted;
         static readonly Dictionary<int, Material> StrokedCache = new Dictionary<int, Material>();
 
         /// <summary>实心圆角块：颜色走顶点色，所以全工程共用一份材质。</summary>
@@ -62,25 +62,16 @@ namespace GlassUI
             return _rounded;
         }
 
-        /// <summary>毛玻璃：奶白度不同就各要一份材质（同一档位共用）。</summary>
-        public static Material Frosted(float milkiness, float rimBoost = 1f, float blurStrength = 1f)
+        /// <summary>毛玻璃：全工程共用一份材质（纯高斯模糊结果，没有叠加项，所以无需按参数分档）。</summary>
+        public static Material Frosted()
         {
-            int key = Mathf.RoundToInt(milkiness * 100f) * 10000 + Mathf.RoundToInt(rimBoost * 100f) * 100 + Mathf.RoundToInt(blurStrength * 100f);
-            if (FrostedCache.TryGetValue(key, out var cached) && cached != null) return cached;
-
-            var shader = Shader.Find("UI/FrostedGlass");
-            if (shader == null) return null;
-
-            var material = new Material(shader)
+            if (_frosted == null)
             {
-                name = $"FrostedGlass (milk {milkiness:0.00})",
-                hideFlags = HideFlags.HideAndDontSave,
-            };
-            material.SetFloat("_Milkiness", milkiness);
-            material.SetFloat("_RimBoost", rimBoost);
-            material.SetFloat("_BlurStrength", blurStrength);
-            FrostedCache[key] = material;
-            return material;
+                var shader = Shader.Find("UI/FrostedGlass");
+                if (shader == null) return null;
+                _frosted = new Material(shader) { name = "FrostedGlass (shared)", hideFlags = HideFlags.HideAndDontSave };
+            }
+            return _frosted;
         }
 
         /// <summary>带描边的实心圆角块（输入框、选中态描边）。</summary>

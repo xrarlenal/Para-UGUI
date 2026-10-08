@@ -25,11 +25,11 @@ namespace GlassUI
             [Tooltip("降采样倍数（0 = 原分辨率，2 = 1/4）。越大越省、越糊，但也越看不出原来的形状")]
             [Range(0, 4)] public int downsample = 2;
 
-            [Tooltip("分离高斯来回次数，越多越糊")]
-            [Range(1, 6)] public int iterations = 2;
+            [Tooltip("高斯迭代次数：每次都是横向+纵向一遍，等效核按 √n 变宽")]
+            [Range(1, 6)] public int iterations = 3;
 
-            [Tooltip("每次迭代的抽样半径（以降采样后的像素为单位）")]
-            [Range(0.2f, 8f)] public float radius = 2.2f;
+            [Tooltip("高斯 σ（以目标像素为单位），就是「核有多宽」")]
+            [Range(0.2f, 12f)] public float sigma = 2.4f;
         }
 
         public Settings settings = new Settings();
@@ -124,7 +124,7 @@ namespace GlassUI
 
                 var cmd = CommandBufferPool.Get("Frosted Glass Blur");
                 cmd.SetGlobalVector(TexelSizeId, new Vector4(1f / width, 1f / height, width, height));
-                cmd.SetGlobalFloat(RadiusId, _settings.radius);
+                cmd.SetGlobalFloat(RadiusId, _settings.sigma);
 
                 // 第一遍顺便完成降采样：直接 blit 到 1/2^n 分辨率，双线性就是最省的下采样
                 cmd.SetGlobalVector(DirectionId, new Vector2(1f, 0f));

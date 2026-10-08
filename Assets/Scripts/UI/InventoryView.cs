@@ -35,7 +35,7 @@ namespace GlassUI
 
         public static InventoryView Create(Transform root)
         {
-            var panel = GlassUI.Panel(root, "背包", GlassTheme.RadiusPanel, 0.09f);
+            var panel = GlassUI.Panel(root, "背包", GlassTheme.RadiusPanel);
             GlassUI.Place(panel.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(1080f, 660f), Vector2.zero);
             var view = panel.gameObject.AddComponent<InventoryView>();
             view.BuildUi(panel.transform);
@@ -84,7 +84,7 @@ namespace GlassUI
             _grid.offsetMin = Vector2.zero;
             _grid.offsetMax = new Vector2(-12f, 0f);
 
-            var detail = GlassUI.Panel(body, "Detail", GlassTheme.RadiusCard, 0.10f);
+            var detail = GlassUI.Panel(body, "Detail", GlassTheme.RadiusCard);
             detail.rectTransform.anchorMin = new Vector2(0.62f, 0f);
             detail.rectTransform.anchorMax = new Vector2(1f, 1f);
             detail.rectTransform.offsetMin = new Vector2(12f, 0f);
