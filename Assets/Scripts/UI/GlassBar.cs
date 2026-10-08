@@ -23,10 +23,10 @@ namespace GlassUI
             var holder = GlassUI.Node(parent, "Glass Bar");
             GlassUI.Place(holder, new Vector2(0f, 0f), size, new Vector2(margin.x, margin.y), new Vector2(0f, 0f));
 
-            var background = GlassUI.Rect(holder, "BG", new Color(1f, 1f, 1f, 0.38f), 99f);
+            var background = GlassUI.Rect(holder, "BG", new Color(1f, 1f, 1f, 0.38f), 6f);
             GlassUI.Stretch(background.rectTransform);
 
-            var fill = GlassUI.Rect(holder, "Fill", GlassTheme.Blue, 99f);
+            var fill = GlassUI.Rect(holder, "Fill", GlassTheme.Blue, 6f);
             GlassUI.Stretch(fill.rectTransform);
 
             var bar = holder.gameObject.AddComponent<GlassBar>();
