@@ -37,11 +37,11 @@ namespace GlassUI
             var label = GlassUI.Label(row, name, 15, TextAnchor.MiddleLeft, GlassTheme.InkSoft);
             GlassUI.Place(label.rectTransform, new Vector2(0f, 0.5f), new Vector2(320f, 26f), Vector2.zero, new Vector2(0f, 0.5f));
 
-            var bg = GlassUI.Rect(row, "BG", new Color(1f, 1f, 1f, 0.40f), 99f, 0.9f, true);   // 背景框降 10% 不透明 + 一点黑阴影
+            var bg = GlassUI.Rect(row, "BG", new Color(0f, 0f, 0f, 0.58f), 6f, 1f, false);   // 背景框降 10% 不透明 + 一点黑阴影
             GlassUI.Place(bg.rectTransform, new Vector2(1f, 0.5f), new Vector2(52f, 28f), Vector2.zero, new Vector2(1f, 0.5f));
             bg.raycastTarget = true;
 
-            var knob = GlassUI.Rect(bg.transform, "Knob", Color.white, 99f);
+            var knob = GlassUI.Rect(bg.transform, "Knob", Color.white, 6f);
             GlassUI.Place(knob.rectTransform, new Vector2(0f, 0.5f), new Vector2(22f, 22f), new Vector2(3f, 0f), new Vector2(0f, 0.5f));
 
             var toggle = row.gameObject.AddComponent<GlassToggle>();

@@ -38,7 +38,7 @@ namespace GlassUI
         public const float RadiusPanel = 28f;
         public const float RadiusCard = 22f;
         public const float RadiusItem = 14f;
-        public const float RadiusPill = 999f;
+        public const float RadiusPill = 12f;   // 统一 R 角矩形，不做椭圆/胶囊
 
         public static Color Hex(string hex)
         {
