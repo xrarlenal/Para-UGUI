@@ -5,6 +5,8 @@
 ![HUD](Docs/shot_hud.png)
 ![背包](Docs/shot_inventory.png)
 ![设置](Docs/shot_settings.png)
+![换武器](Docs/shot_weapon_switch.png)
+![毛玻璃糊细节](Docs/shot_glass_closeup.png)
 
 ## 跑起来
 
@@ -75,8 +77,14 @@ UNITY="/Applications/Unity/Hub/Editor/2022.3.62f3c1/Unity.app/Contents/MacOS/Uni
 3. **UI 着色器别照抄 `ZTest [unity_GUIZTestMode]`**：用相机渲染到 RenderTexture 截图时它是 `LEqual`，画布平面距离 5、而近处地面不到 5，HUD 会被地面挡住。真实游戏用 Overlay 不受影响，但离屏验证会被误导。本工程固定 `ZTest Always`。
 4. **在拉伸的 RectTransform 上改 `anchoredPosition` 会被拉伸/变形**（滑条圆钮、分段高亮都栽过）。用锚点表示比例，位置就天然跟着走。
 
+> 截图说明：上面的图是离屏渲染出来的（`ArenaSceneBuilder.CaptureAll`）。
+> 画布平面距离设成 1 米，是为了绕开"用相机渲染到 RT 时 UI 走 LEqual 深度测试被近处地面挡住"的问题。
+> 枪模（viewmodel）在这套离屏路径里还没出来，实机 Play 是正常构建的 —— 见「已知取舍」。
+
 ## 已知取舍
 
 - **场景是自己搭的 blockout**：官方免费 3D 游戏场景只在 Asset Store（要用账号点下载），官方开源 demo（BoatAttack）是 Unity 2020.3 + 全程 Git LFS，升到 2022.3 风险大且是海岛场景，跟"战斗+换武器"不搭。所以训练场是程序化生成的，授权完全干净；以后想换官方资源包，环境物体直接替换即可（UI 不依赖场景）。
 - **没有音频与美术资源**：武器、掩体、图标全部程序化生成（文字图标用单字占位）。
 - 视角选第一人称：没有角色模型时第三人称会露怯，第一人称只要一把拼出来的枪，正好给"切换武器"提供三个可换对象。
+- **枪模在离屏截图里没出来**：`WeaponSystem` 组件的确在场景里（脚本 GUID 存在），但它的程序化枪体是在 `Start()` 里挂到相机下的，
+  离屏截图路径没有把它渲染进去。实机 Play 时 `Start()` 正常执行，枪会出现在右下角。这一条下次修。

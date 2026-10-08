@@ -186,21 +186,36 @@ namespace GlassUI.EditorTools
                 return;
             }
 
-            // 截图机位：抬高到离地 7.5 米。
-            // 原因：相机渲染时画布用 LEqual 深度测试，UI 平面在相机前 5 单位，
-            // 近处地面（不到 5 单位）会把 HUD 和文字挡住。抬高之后所有几何都远于画布平面，
-            // 截图就等价于 Overlay 画布的真实表现（顺便得到一个更好看的俯视构图）。
-            var player = Object.FindFirstObjectByType<Game.PlayerController>();
-            if (player != null)
-            {
-                player.transform.position = new Vector3(-2f, 7.5f, 6f);
-                player.transform.rotation = Quaternion.Euler(0f, 4f, 0f);
-            }
-            var head = cam.transform;
-            head.localRotation = Quaternion.Euler(-13f, 0f, 0f);
-
             ui.BuildUi();
             ui.PrepareForCapture();
+            Object.FindFirstObjectByType<WeaponSystem>()?.EnsureBuilt();
+
+            // 第一人称平视机位。画布平面距离设成 1：相机渲染时 UI 走 LEqual 深度测试，
+            // 平面越近，能被地面挡住的部分就越少（画布平面 1 米内没有可见地面），
+            // 这样截出来等价于 Overlay 画布的真实观感。
+            PlaneDistance = 1f;
+
+            PlacePlayer(new Vector3(-3f, 0.1f, 2f), 3f);
+            Render(cam, canvas, width, height, $"{dir}/01_gameplay.png");
+
+            ui.OpenInventoryForCapture();
+            Render(cam, canvas, width, height, $"{dir}/02_inventory.png");
+            ui.ClosePanelsForCapture();
+
+            ui.OpenSettingsForCapture();
+            Render(cam, canvas, width, height, $"{dir}/03_settings.png");
+            ui.ClosePanelsForCapture();
+
+            // 换霰弹枪 + 靠近平靶区：展示武器条高亮与枪模变化
+            var weapons = Object.FindFirstObjectByType<WeaponSystem>();
+            if (weapons != null) weapons.Equip(1, true);
+            PlacePlayer(new Vector3(-6f, 0.1f, 22f), 6f);
+            Render(cam, canvas, width, height, $"{dir}/04_weapon_shotgun.png");
+
+            // 贴近箱堆：看毛玻璃把细节糊掉、和周围清晰画面对比
+            if (weapons != null) weapons.Equip(0, true);
+            PlacePlayer(new Vector3(-13f, 0.1f, 4f), 12f);
+            Render(cam, canvas, width, height, $"{dir}/05_glass_over_detail.png");
             Render(cam, canvas, width, height, $"{dir}/01_hud.png");
 
             ui.OpenInventoryForCapture();
@@ -244,6 +259,20 @@ namespace GlassUI.EditorTools
             }
         }
 
+        static float PlaneDistance = 1f;
+
+        static void PlacePlayer(Vector3 position, float yaw)
+        {
+            var player = Object.FindFirstObjectByType<Game.PlayerController>();
+            if (player != null)
+            {
+                player.transform.position = position;
+                player.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+            }
+            var cam = Object.FindFirstObjectByType<Camera>();
+            if (cam != null) cam.transform.localRotation = Quaternion.identity;   // 平视
+        }
+
         static void Render(Camera cam, Canvas canvas, int width, int height, string path)
         {
             var rt = new RenderTexture(width, height, 24, RenderTextureFormat.ARGB32);
@@ -254,7 +283,7 @@ namespace GlassUI.EditorTools
             float previousPlane = canvas.planeDistance;
             canvas.renderMode = RenderMode.ScreenSpaceCamera;
             canvas.worldCamera = cam;
-            canvas.planeDistance = 5f;
+            canvas.planeDistance = PlaneDistance;
 
             Canvas.ForceUpdateCanvases();
             if (!_dumped) { _dumped = true; DumpHudLayout(cam); }

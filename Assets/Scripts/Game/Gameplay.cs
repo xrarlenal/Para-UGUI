@@ -189,6 +189,7 @@ namespace GlassUI.Game
     /// 武器系统：三把程序化拼出来的枪、切换动画、开火、后坐、换弹、命中反馈。
     /// 第一人称视角下枪挂在相机下面。
     /// </summary>
+    [ExecuteAlways]   // 编辑器里也建出枪模，离屏截图才看得到 viewmodel
     public class WeaponSystem : MonoBehaviour
     {
         public Camera viewCamera;
@@ -217,6 +218,11 @@ namespace GlassUI.Game
             BuildDefaults();
             RebuildBodies();
             Equip(0, true);
+        }
+
+        void OnEnable()
+        {
+            if (!Application.isPlaying) Start();   // 编辑器里手动补一次
         }
 
         void BuildDefaults()
@@ -265,8 +271,8 @@ namespace GlassUI.Game
             var root = new GameObject("Body: " + def.kind);
             root.transform.SetParent(_holder, false);
 
-            var metal = new Color(0.16f, 0.18f, 0.22f);
-            var dark = new Color(0.10f, 0.11f, 0.13f);
+            var metal = new Color(0.46f, 0.50f, 0.58f);   // 提亮：原来深灰压在深地板上看不见
+            var dark = new Color(0.30f, 0.33f, 0.39f);
 
             Part(root.transform, "Receiver", new Vector3(0f, 0f, 0f),
                 new Vector3(def.bodyHeight * 2.6f, def.bodyHeight, def.bodyLength), metal);
@@ -319,6 +325,31 @@ namespace GlassUI.Game
             }
             renderer.sharedMaterial = mat;
             return go;
+        }
+
+        /// <summary>强制把枪模建出来（编辑器/截图用）。</summary>
+        public void EnsureBuilt()
+        {
+            if (viewCamera == null) viewCamera = GetComponentInChildren<Camera>();
+            if (weapons.Count == 0) BuildDefaults();
+            if (_holder == null) { RebuildBodies(); Equip(0, true); }
+
+            Debug.Log($"[DIAG] 武器：holder={(_holder != null ? _holder.name : "null")} " +
+                      $"children={(_holder != null ? _holder.childCount : 0)} " +
+                      $"world={(_holder != null ? _holder.position.ToString("F2") : "-")} " +
+                      $"cam={viewCamera?.name} 激活={gameObject.activeInHierarchy}");
+
+            if (_holder != null)
+            {
+                var first = _holder.childCount > 0 ? _holder.GetChild(0) : null;
+                if (first != null)
+                {
+                    var r = first.GetComponentInChildren<Renderer>();
+                    var w = first.Find("Receiver");
+                    Debug.Log($"[DIAG]   body0={first.name} active={first.gameObject.activeInHierarchy} " +
+                              $"renderer={(r != null ? r.name : "null")} receiverWorld={(w != null ? w.position.ToString("F2") : "-")}");
+                }
+            }
         }
 
         public void Equip(int index, bool instant = false)
@@ -456,7 +487,7 @@ namespace GlassUI.Game
 
         void Update()
         {
-            if (_holder == null) return;
+            if (!Application.isPlaying || _holder == null) return;
 
             // 后坐：弹簧回正，比线性自然
             _recoil = Mathf.SmoothDamp(_recoil, 0f, ref _recoilVel, 0.09f, 40f, Time.unscaledDeltaTime);
