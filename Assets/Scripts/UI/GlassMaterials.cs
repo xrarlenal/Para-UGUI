@@ -24,13 +24,21 @@ namespace GlassUI
 
             var sprite = Resources.Load<Sprite>(resourcePath);
             if (sprite == null)
-                Debug.LogWarning($"[GlassUI] 缺少圆角贴图 {resourcePath}，请先执行菜单「Glass Demo / 0. 生成圆角贴图」");
+            {
+                // 兜底：缺图时退到已有的档位，绝不让控件变成直角
+                Debug.LogWarning($"[GlassUI] 缺少圆角贴图 {resourcePath}，退回已有档位");
+                foreach (var r in BakedRadii)
+                {
+                    sprite = Resources.Load<Sprite>($"GlassSprites/round{(int)r:00}");
+                    if (sprite != null) break;
+                }
+            }
 
             Cache[resourcePath] = sprite;
             return sprite;
         }
 
-        static readonly float[] BakedRadii = { 5f, 6f, 8f, 10f, 12f, 14f, 18f, 22f, 26f, 30f, 38f, 44f };
+        static readonly float[] BakedRadii = { 8f, 14f, 22f, 30f, 44f };   // 必须与磁盘上的 roundNN.png 一致
 
         /// <summary>
         /// 取半径最接近的贴图。半径与贴图一一对应 → 九宫格不需要缩放 →
