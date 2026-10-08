@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using GlassUI.Game;
 
@@ -191,6 +192,7 @@ namespace GlassUI.EditorTools
 
             ui.BuildUi();
             ui.PrepareForCapture();
+            SetBlurBeforeUi(true);      // 截图时保证糊的是「没有 UI 的画面」
             var weaponSys = FindPlayer() != null ? FindPlayer().GetComponent<WeaponSystem>() : null;
             if (weaponSys == null) Debug.LogError("[DIAG] Player 上没找到 WeaponSystem");
             weaponSys?.EnsureBuilt();
@@ -231,6 +233,7 @@ namespace GlassUI.EditorTools
             Render(cam, canvas, width, height, $"{dir}/03_settings.png");
             ui.ClosePanelsForCapture();
 
+            SetBlurBeforeUi(false);
             Debug.Log($"[GlassUI] Arena 截图完成，输出 {dir}");
         }
 
@@ -285,6 +288,36 @@ namespace GlassUI.EditorTools
 
             var cam = Object.FindFirstObjectByType<Camera>();
             if (cam != null) cam.transform.localRotation = Quaternion.identity;   // 平视
+        }
+
+        /// <summary>
+        /// 截图用的：把毛玻璃 Pass 挪到不透明物体之后。
+        /// 因为截图时画布被迫用 ScreenSpaceCamera（Overlay 进不了相机的 RT），
+        /// UI 会在半透明队列里先画 —— 此时 AfterRenderingTransparents 的模糊会把 UI 自己也糊进去。
+        /// 挪到 opaques 之后就等价于真实 Overlay 的表现（糊的是「没有 UI 的游戏画面」）。
+        /// </summary>
+        static void SetBlurBeforeUi(bool beforeUi)
+        {
+            foreach (var guid in AssetDatabase.FindAssets("t:UniversalRendererData"))
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                if (path.StartsWith("Packages/")) continue;
+                var data = AssetDatabase.LoadAssetAtPath<UniversalRendererData>(path);
+                if (data == null) continue;
+                foreach (var rf in data.rendererFeatures)
+                {
+                    if (rf is FrostedGlassFeature f)
+                    {
+                        f.settings.injectionPoint = beforeUi
+                            ? RenderPassEvent.AfterRenderingOpaques
+                            : RenderPassEvent.AfterRenderingTransparents;
+                        EditorUtility.SetDirty(f);
+                    }
+                }
+                data.SetDirty();
+                EditorUtility.SetDirty(data);
+            }
+            AssetDatabase.SaveAssets();
         }
 
         static void Render(Camera cam, Canvas canvas, int width, int height, string path)

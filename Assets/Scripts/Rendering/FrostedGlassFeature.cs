@@ -20,16 +20,16 @@ namespace GlassUI
         public class Settings
         {
             [Tooltip("插在管线的哪一步之后。Transparents 之后能连半透明物体一起糊（UI 通常更想要这个）")]
-            public RenderPassEvent injectionPoint = RenderPassEvent.AfterRenderingTransparents;
+            public RenderPassEvent injectionPoint = RenderPassEvent.AfterRenderingTransparents;   // 真实 Overlay 画布下 UI 在这之后才画，所以糊的是「没有 UI 的画面」
 
-            [Tooltip("降采样倍数（0 = 原分辨率，2 = 1/4）。越大越省、越糊，但也越看不出原来的形状")]
-            [Range(0, 4)] public int downsample = 2;
+            [Tooltip("降采样倍数。0 = 与屏幕同分辨率（默认，质量最高）。只在性能吃紧时才升它，升了就不是全分辨率纹理了")]
+            [Range(0, 4)] public int downsample = 0;
 
-            [Tooltip("高斯迭代次数：每次都是横向+纵向一遍，等效核按 √n 变宽")]
-            [Range(1, 6)] public int iterations = 3;
+            [Tooltip("高斯迭代次数：每次都是横向+纵向一遍，等效 σ 按 √n 变宽")]
+            [Range(1, 6)] public int iterations = 2;
 
             [Tooltip("高斯 σ（以目标像素为单位），就是「核有多宽」")]
-            [Range(0.2f, 12f)] public float sigma = 2.4f;
+            [Range(0.2f, 24f)] public float sigma = 8f;
         }
 
         public Settings settings = new Settings();

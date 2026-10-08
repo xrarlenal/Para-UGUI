@@ -82,6 +82,6 @@ MonoBehaviour:
   m_Active: 1
   settings:
     injectionPoint: 500
-    downsample: 2
-    iterations: 3
-    sigma: 2.4
+    downsample: 0
+    iterations: 2
+    sigma: 8

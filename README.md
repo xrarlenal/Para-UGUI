@@ -19,8 +19,9 @@
 
 不是贴图，是每帧真实计算：
 
-1. URP 里挂了一个 `FrostedGlassFeature`（ScriptableRendererFeature），在 `AfterRenderingTransparents` 插入一个 Pass：
-   **把相机颜色拷出来 → 降采样到 1/4 → 先横后竖做分离式高斯（两次迭代）→ 作为全局纹理 `_FrostedGlassTex` 公布出去。**
+1. URP 里挂了一个 `FrostedGlassFeature`（ScriptableRendererFeature），在 UI 之前插入一个 Pass：
+   **把「没有 UI 的游戏画面」拷到一张与屏幕同分辨率的离屏纹理 → 在上面做高卷积核高斯 → 作为全局纹理 `_FrostedGlassTex` 公布出去。**
+   （默认 `downsample = 0` 即全分辨率；它是质量旋钮，不是必须的优化）
 2. UI 那边用 `UI/FrostedGlass` 着色器按**屏幕 UV** 采这张图 —— 所以每块面板显示的正好是它身后那块被糊掉的画面，
    1:1 精确裁切，不平铺、不拉伸（这就是"按 uv 精确裁切"的落点）。
 3. 模糊是**高卷积核真高斯**：分离式 17 抽，权重用 `exp(-x²/2σ²)` 现算（不是盒状近似），
