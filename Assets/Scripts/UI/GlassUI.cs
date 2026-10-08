@@ -206,7 +206,7 @@ namespace GlassUI
         {
             var rt = Node(parent, name);
             var image = rt.gameObject.AddComponent<Image>();
-            image.sprite = GlassSprites.Get(GlassSprites.ForRadius(radius));
+            image.sprite = GlassSprites.Get(GlassSprites.ExactFor(radius));
             image.type = Image.Type.Sliced;
             image.material = GlassMaterials.Frosted(blurLod);
             image.color = Color.white;      // 白色 = 不给玻璃上色
@@ -223,7 +223,7 @@ namespace GlassUI
         {
             var rt = Node(parent, name);
             var image = rt.gameObject.AddComponent<Image>();
-            image.sprite = GlassSprites.Get(GlassSprites.ForRadius(radius));
+            image.sprite = GlassSprites.Get(GlassSprites.ExactFor(radius));
             image.type = Image.Type.Sliced;
             image.material = GlassMaterials.Rounded();
             image.color = opacity >= 1f ? color : new Color(color.r, color.g, color.b, color.a * opacity);

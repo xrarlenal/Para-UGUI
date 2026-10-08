@@ -30,14 +30,22 @@ namespace GlassUI
             return sprite;
         }
 
-        /// <summary>按想要的圆角半径挑最接近的贴图（九宫格圆角是固定像素的，半径要跟贴图对上）。</summary>
-        public static string ForRadius(float radius)
+        static readonly float[] BakedRadii = { 5f, 6f, 8f, 10f, 12f, 14f, 18f, 22f, 26f, 30f, 38f, 44f };
+
+        /// <summary>
+        /// 取半径最接近的贴图。半径与贴图一一对应 → 九宫格不需要缩放 →
+        /// 圆角弧线不会被重采样，也就不会在弧线上插值出那圈暗边。
+        /// </summary>
+        public static string ExactFor(float radius)
         {
-            if (radius <= 11f) return Round08;
-            if (radius <= 18f) return Round14;
-            if (radius <= 26f) return Round22;
-            if (radius <= 37f) return Round30;
-            return Round44;
+            float best = BakedRadii[0];
+            float bestDelta = Mathf.Abs(radius - best);
+            foreach (var r in BakedRadii)
+            {
+                float d = Mathf.Abs(radius - r);
+                if (d < bestDelta) { bestDelta = d; best = r; }
+            }
+            return $"GlassSprites/round{(int)best:00}";
         }
     }
 
