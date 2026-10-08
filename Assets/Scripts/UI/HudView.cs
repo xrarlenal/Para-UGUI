@@ -5,10 +5,6 @@ using GlassUI.Game;
 
 namespace GlassUI
 {
-    /// <summary>
-    /// 战斗 HUD：准星、血量、弹药、分数、武器条、命中标记、受击红闪、右上飘字。
-    /// 全部长在毛玻璃上；数值从 GameState / WeaponSystem 的事件来。
-    /// </summary>
     public class HudView : MonoBehaviour
     {
         GameState _state;
@@ -289,7 +285,7 @@ namespace GlassUI
                 if (_scoreText != null) _scoreText.text = $"{_state.score:0000}";
             }
 
-            if (_weapons != null && _weapons.Current != null)
+            if (_weapons != null && _weapons.Current != null && _ammoText != null)
             {
                 var def = _weapons.Current;
                 if (_weaponName != null) _weaponName.text = def.name;
@@ -298,6 +294,8 @@ namespace GlassUI
 
                 for (int i = 0; i < _weaponChipImages.Count; i++)
                 {
+                    // 编辑器里 BuildUi 可能被调两次，旧实例的图片已被销毁 —— 访问会抛 MissingReference
+                    if (_weaponChipImages[i] == null || _weaponChipLabels[i] == null) continue;
                     bool active = i == _weapons.CurrentIndex;
                     _weaponChipImages[i].color = active ? GlassTheme.Blue : new Color(1f, 1f, 1f, 0.5f);
                     _weaponChipLabels[i].color = active ? GlassTheme.White : GlassTheme.Ink;
@@ -326,49 +324,5 @@ namespace GlassUI
             }
         }
     }
-
     /// <summary>毛玻璃上的进度条（血条 / 装弹条都用它）。</summary>
-    public class GlassBar : MonoBehaviour
-    {
-        Image _fill;
-        float _value = 1f;
-        float _displayed = 1f;
-        float _velocity;
-
-        public float Value
-        {
-            get { return _value; }
-            set { _value = Mathf.Clamp01(value); }
-        }
-
-        public static GlassBar Create(Transform parent, Vector2 size, Vector2 anchorPos, Vector2 margin)
-        {
-            var holder = GlassUI.Node(parent, "Glass Bar");
-            GlassUI.Place(holder, new Vector2(0f, 0f), size, new Vector2(margin.x, margin.y), new Vector2(0f, 0f));
-
-            var background = GlassUI.Rect(holder, "BG", new Color(1f, 1f, 1f, 0.38f), 99f);
-            GlassUI.Stretch(background.rectTransform);
-
-            var fill = GlassUI.Rect(holder, "Fill", GlassTheme.Blue, 99f);
-            GlassUI.Stretch(fill.rectTransform);
-
-            var bar = holder.gameObject.AddComponent<GlassBar>();
-            bar._fill = fill;
-            return bar;
-        }
-
-        void Update()
-        {
-            // 血条用平滑跟随：掉血时能看出"追条"，比硬切有质感
-            _displayed = Mathf.SmoothDamp(_displayed, _value, ref _velocity, 0.18f, 10f, Time.unscaledDeltaTime);
-            if (_fill == null) return;
-
-            var rt = _fill.rectTransform;
-            rt.anchorMin = new Vector2(0f, 0f);
-            rt.anchorMax = new Vector2(Mathf.Clamp01(_displayed), 1f);
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
-            _fill.color = _displayed < 0.3f ? GlassTheme.Bad : GlassTheme.Blue;
-        }
-    }
 }

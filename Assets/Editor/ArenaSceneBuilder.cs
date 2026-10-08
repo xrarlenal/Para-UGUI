@@ -76,8 +76,11 @@ namespace GlassUI.EditorTools
             var player = playerGo.AddComponent<Game.PlayerController>();
             player.head = camGo.transform;
 
-            var weapons = playerGo.AddComponent<Game.WeaponSystem>();
+            // 用 ?? 兜底：AddComponent 的 OnEnable 万一抛异常，组件可能没挂上
+            var weapons = playerGo.GetComponent<Game.WeaponSystem>();
+            if (weapons == null) weapons = playerGo.AddComponent<Game.WeaponSystem>();
             weapons.viewCamera = camera;
+            Debug.Log($"[DIAG] 建场景：Player 上有 WeaponSystem = {playerGo.GetComponent<Game.WeaponSystem>() != null}");
 
             var stateGo = new GameObject("Game State");
             var state = stateGo.AddComponent<Game.GameState>();
@@ -188,7 +191,9 @@ namespace GlassUI.EditorTools
 
             ui.BuildUi();
             ui.PrepareForCapture();
-            Object.FindFirstObjectByType<WeaponSystem>()?.EnsureBuilt();
+            var weaponSys = FindPlayer() != null ? FindPlayer().GetComponent<WeaponSystem>() : null;
+            if (weaponSys == null) Debug.LogError("[DIAG] Player 上没找到 WeaponSystem");
+            weaponSys?.EnsureBuilt();
 
             // 第一人称平视机位。画布平面距离设成 1：相机渲染时 UI 走 LEqual 深度测试，
             // 平面越近，能被地面挡住的部分就越少（画布平面 1 米内没有可见地面），
@@ -207,7 +212,7 @@ namespace GlassUI.EditorTools
             ui.ClosePanelsForCapture();
 
             // 换霰弹枪 + 靠近平靶区：展示武器条高亮与枪模变化
-            var weapons = Object.FindFirstObjectByType<WeaponSystem>();
+            var weapons = FindPlayer() != null ? FindPlayer().GetComponent<WeaponSystem>() : null;
             if (weapons != null) weapons.Equip(1, true);
             PlacePlayer(new Vector3(-6f, 0.1f, 22f), 6f);
             Render(cam, canvas, width, height, $"{dir}/04_weapon_shotgun.png");
@@ -261,14 +266,23 @@ namespace GlassUI.EditorTools
 
         static float PlaneDistance = 1f;
 
+        static Transform FindPlayer()
+        {
+            var go = GameObject.Find("Player");
+            return go != null ? go.transform : null;
+        }
+
         static void PlacePlayer(Vector3 position, float yaw)
         {
-            var player = Object.FindFirstObjectByType<Game.PlayerController>();
+            var player = FindPlayer();
             if (player != null)
             {
-                player.transform.position = position;
-                player.transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+                player.position = position;
+                player.rotation = Quaternion.Euler(0f, yaw, 0f);
+                Debug.Log($"[DIAG] 机位 → {position} yaw={yaw}");
             }
+            else Debug.LogError("[DIAG] 找不到 Player 对象");
+
             var cam = Object.FindFirstObjectByType<Camera>();
             if (cam != null) cam.transform.localRotation = Quaternion.identity;   // 平视
         }

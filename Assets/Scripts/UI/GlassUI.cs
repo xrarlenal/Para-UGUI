@@ -5,9 +5,6 @@ using UnityEngine.UI;
 
 namespace GlassUI
 {
-    /// <summary>
-    /// UI 搭建工厂。这一层只做「蓝白 + 圆角 + 毛玻璃」这一套视觉语言，业务逻辑不在这里。
-    /// </summary>
     public static class GlassUI
     {
         public static Font Font
@@ -303,60 +300,8 @@ namespace GlassUI
             return s.Length <= 12 ? s : s.Substring(0, 12) + "…";
         }
     }
-
     /// <summary>
     /// 悬停/按下的非线性反馈：缩放 + 轻微上浮。挂在任何带 RectTransform 的交互物件上都行。
     /// 编辑器里（离线截图）直接落终态，不跑协程。
     /// </summary>
-    public class HoverFx : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
-    {
-        public float hoverScale = 1.04f;
-        public float pressScale = 0.97f;
-        public float duration = 0.16f;
-        public float hoverLift = 1.5f;
-
-        RectTransform _rt;
-        Vector3 _baseScale = Vector3.one;
-        Vector2 _basePos;
-        Coroutine _anim;
-        bool _hovering;
-
-        void Awake()
-        {
-            _rt = transform as RectTransform;
-            if (_rt != null)
-            {
-                _baseScale = _rt.localScale;
-                _basePos = _rt.anchoredPosition;
-            }
-        }
-
-        public void OnPointerEnter(PointerEventData eventData) { _hovering = true; Play(hoverScale, hoverLift); }
-        public void OnPointerExit(PointerEventData eventData) { _hovering = false; Play(1f, 0f); }
-        public void OnPointerDown(PointerEventData eventData) { Play(pressScale, 0f); }
-        public void OnPointerUp(PointerEventData eventData) { Play(_hovering ? hoverScale : 1f, _hovering ? hoverLift : 0f); }
-
-        void Play(float scale, float lift)
-        {
-            if (_rt == null) return;
-            if (!GlassAnim.Playing)
-            {
-                _rt.localScale = _baseScale * scale;
-                _rt.anchoredPosition = _basePos + new Vector2(0f, lift);
-                return;
-            }
-
-            var fromScale = _rt.localScale;
-            var toScale = _baseScale * scale;
-            var fromPos = _rt.anchoredPosition;
-            var toPos = _basePos + new Vector2(0f, lift);
-
-            GlassAnim.Start(this, ref _anim, GlassAnim.Curve(duration, t =>
-            {
-                if (_rt == null) return;
-                _rt.localScale = Vector3.LerpUnclamped(fromScale, toScale, t);
-                _rt.anchoredPosition = Vector2.LerpUnclamped(fromPos, toPos, t);
-            }, Ease.OutCubic));
-        }
-    }
 }
